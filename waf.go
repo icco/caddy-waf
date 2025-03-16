@@ -32,6 +32,21 @@ func (WAF) CaddyModule() caddy.ModuleInfo {
 	}
 }
 
+// Provision implements caddy.Provisioner.
+func (m *WAF) Provision(ctx caddy.Context) error {
+	return nil
+}
+
+// Validate implements caddy.Validator.
+func (m *WAF) Validate() error {
+	return nil
+}
+
+// UnmarshalCaddyfile implements caddyfile.Unmarshaler.
+func (m *WAF) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
+	return nil
+}
+
 // ServeHTTP implements caddyhttp.MiddlewareHandler.
 func (m WAF) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
 	return next.ServeHTTP(w, r)
