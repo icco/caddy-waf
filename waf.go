@@ -5,7 +5,9 @@ import (
 
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
-	"github.com/caddyserver/caddy/v2/caddyhttp"
+	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
+	coreruleset "github.com/corazawaf/coraza-coreruleset/v4"
+	coraza "github.com/corazawaf/coraza/v3"
 )
 
 // Interface guards
@@ -22,6 +24,7 @@ func init() {
 
 // WAF is a Caddy module that implements an HTTP middleware that blocks stuff.
 type WAF struct {
+	crz coraza.WAF
 }
 
 // CaddyModule returns the Caddy module information.
@@ -34,6 +37,18 @@ func (WAF) CaddyModule() caddy.ModuleInfo {
 
 // Provision implements caddy.Provisioner.
 func (m *WAF) Provision(ctx caddy.Context) error {
+	crz, err := coraza.NewWAF(
+		coraza.NewWAFConfig().
+			WithDirectives(`
+						Include @owasp_crs/REQUEST-911-METHOD-ENFORCEMENT.conf
+				`).
+			WithRootFS(coreruleset.FS),
+	)
+	if err != nil {
+		return err
+	}
+
+	m.crz = crz
 	return nil
 }
 
