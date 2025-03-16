@@ -2,6 +2,25 @@
 
 A dumb and aggressive firewall for Caddy v2.
 
+## Usage
+
+Caddyfile
+```caddy
+{
+  order waf first
+}
+
+http://127.0.0.1:8080 {
+ waf
+}
+```
+
+Build command:
+```sh
+xcaddy build ${CADDY_VERSION} \
+    --with github.com/icco/caddy-waf
+```
+
 ## Sources
 
 The following are data sources for bad actors:

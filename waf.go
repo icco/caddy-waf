@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/caddyserver/caddy/v2"
-	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
 	coreruleset "github.com/corazawaf/coraza-coreruleset/v4"
 	coraza "github.com/corazawaf/coraza/v3"
@@ -15,7 +14,6 @@ var (
 	_ caddy.Provisioner           = (*WAF)(nil)
 	_ caddy.Validator             = (*WAF)(nil)
 	_ caddyhttp.MiddlewareHandler = (*WAF)(nil)
-	_ caddyfile.Unmarshaler       = (*WAF)(nil)
 )
 
 func init() {
@@ -40,8 +38,11 @@ func (m *WAF) Provision(ctx caddy.Context) error {
 	crz, err := coraza.NewWAF(
 		coraza.NewWAFConfig().
 			WithDirectives(`
-						Include @owasp_crs/REQUEST-911-METHOD-ENFORCEMENT.conf
-				`).
+			Include @coraza.conf-recommended
+			Include @crs-setup.conf.example
+			Include @owasp_crs/*.conf
+			SecRuleEngine On
+			`).
 			WithRootFS(coreruleset.FS),
 	)
 	if err != nil {
@@ -54,11 +55,6 @@ func (m *WAF) Provision(ctx caddy.Context) error {
 
 // Validate implements caddy.Validator.
 func (m *WAF) Validate() error {
-	return nil
-}
-
-// UnmarshalCaddyfile implements caddyfile.Unmarshaler.
-func (m *WAF) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 	return nil
 }
 
